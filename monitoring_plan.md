@@ -1,5 +1,7 @@
 # Monitoring & Observability Plan — 143it Azure DevOps
 
+> **Related:** [Operational Runbooks](operational_runbooks.md) | [Success Metrics](success_metrics.md) | [Disaster Recovery](disaster_recovery_plan.md)
+
 ## 1. Monitoring Architecture
 
 ```mermaid

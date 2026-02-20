@@ -1,0 +1,325 @@
+# Standard CI Build Pipeline Template
+# 143it Azure DevOps Enterprise
+#
+# Usage:
+#   - template: templates/pipeline-build-template.yml
+#     parameters:
+#       projectPath: 'src/MyApp'
+#       testPath: 'tests/MyApp.Tests'
+#       publishArtifact: true
+
+parameters:
+- name: projectPath
+  type: string
+  default: 'src'
+  displayName: 'Path to project source code'
+
+- name: testPath
+  type: string
+  default: 'tests'
+  displayName: 'Path to test projects'
+
+- name: dotnetVersion
+  type: string
+  default: '8.0.x'
+  displayName: '.NET SDK version'
+
+- name: publishArtifact
+  type: boolean
+  default: true
+  displayName: 'Publish build artifact'
+
+- name: runTests
+  type: boolean
+  default: true
+  displayName: 'Run unit tests'
+
+- name: runCodeAnalysis
+  type: boolean
+  default: true
+  displayName: 'Run code analysis'
+
+- name: containerize
+  type: boolean
+  default: false
+  displayName: 'Build container image'
+
+- name: imageName
+  type: string
+  default: ''
+  displayName: 'Container image name'
+
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+    - feature/*
+    - bugfix/*
+    - release/*
+  paths:
+    include:
+    - ${{ parameters.projectPath }}/**
+    - ${{ parameters.testPath }}/**
+
+pr:
+  branches:
+    include:
+    - main
+    - develop
+  paths:
+    include:
+    - ${{ parameters.projectPath }}/**
+    - ${{ parameters.testPath }}/**
+
+variables:
+  buildConfiguration: 'Release'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Semantic versioning
+  majorVersion: 1
+  minorVersion: 0
+  patchVersion: $[counter(format('{0}.{1}', variables['majorVersion'], variables['minorVersion']), 0)]
+  version: $(majorVersion).$(minorVersion).$(patchVersion)
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+# ============================================
+# Stage 1: Build
+# ============================================
+- stage: Build
+  displayName: 'Build'
+  jobs:
+  - job: Build
+    displayName: 'Build Application'
+    steps:
+    # Setup
+    - task: UseDotNet@2
+      displayName: 'Install .NET SDK ${{ parameters.dotnetVersion }}'
+      inputs:
+        packageType: 'sdk'
+        version: '${{ parameters.dotnetVersion }}'
+
+    # Restore
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet packages'
+      inputs:
+        command: 'restore'
+        projects: '${{ parameters.projectPath }}/**/*.csproj'
+        feedsToUse: 'select'
+
+    # Build
+    - task: DotNetCoreCLI@2
+      displayName: 'Build solution'
+      inputs:
+        command: 'build'
+        projects: '${{ parameters.projectPath }}/**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-restore /p:Version=$(version)'
+
+    # Publish build output
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish application'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        projects: '${{ parameters.projectPath }}/**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/app --no-build'
+        zipAfterPublish: true
+
+    # Publish artifact
+    - ${{ if eq(parameters.publishArtifact, true) }}:
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish artifact'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/app'
+          ArtifactName: 'drop-$(version)'
+          publishLocation: 'Container'
+
+# ============================================
+# Stage 2: Test
+# ============================================
+- ${{ if eq(parameters.runTests, true) }}:
+  - stage: Test
+    displayName: 'Test'
+    dependsOn: Build
+    jobs:
+    - job: UnitTests
+      displayName: 'Unit Tests'
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Install .NET SDK'
+        inputs:
+          packageType: 'sdk'
+          version: '${{ parameters.dotnetVersion }}'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore test projects'
+        inputs:
+          command: 'restore'
+          projects: '${{ parameters.testPath }}/**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run unit tests with coverage'
+        inputs:
+          command: 'test'
+          projects: '${{ parameters.testPath }}/**/*.csproj'
+          arguments: >
+            --configuration $(buildConfiguration)
+            --collect:"XPlat Code Coverage"
+            --logger trx
+            --results-directory $(Agent.TempDirectory)/TestResults
+          publishTestResults: true
+
+      # Publish code coverage
+      - task: PublishCodeCoverageResults@2
+        displayName: 'Publish code coverage'
+        inputs:
+          summaryFileLocation: '$(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml'
+          failIfCoverageEmpty: true
+
+# ============================================
+# Stage 3: Code Analysis
+# ============================================
+- ${{ if eq(parameters.runCodeAnalysis, true) }}:
+  - stage: CodeAnalysis
+    displayName: 'Code Analysis'
+    dependsOn: Build
+    jobs:
+    - job: SAST
+      displayName: 'Static Analysis'
+      steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '${{ parameters.dotnetVersion }}'
+
+      # SonarQube analysis (if configured)
+      - task: SonarQubePrepare@5
+        displayName: 'Prepare SonarQube analysis'
+        inputs:
+          SonarQube: 'SonarQube-Connection'
+          scannerMode: 'MSBuild'
+          projectKey: '$(Build.Repository.Name)'
+          projectName: '$(Build.Repository.Name)'
+          projectVersion: '$(version)'
+        condition: ne(variables['SonarQube-Connection'], '')
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build for analysis'
+        inputs:
+          command: 'build'
+          projects: '${{ parameters.projectPath }}/**/*.csproj'
+          arguments: '--configuration $(buildConfiguration)'
+
+      - task: SonarQubeAnalyze@5
+        displayName: 'Run SonarQube analysis'
+        condition: ne(variables['SonarQube-Connection'], '')
+
+      - task: SonarQubePublish@5
+        displayName: 'Publish SonarQube results'
+        inputs:
+          pollingTimeoutSec: '300'
+        condition: ne(variables['SonarQube-Connection'], '')
+
+    - job: DependencyCheck
+      displayName: 'Dependency Scanning'
+      steps:
+      - task: dependency-check-build-task@6
+        displayName: 'OWASP Dependency Check'
+        inputs:
+          projectName: '$(Build.Repository.Name)'
+          scanPath: '${{ parameters.projectPath }}'
+          format: 'HTML,JSON'
+          failOnCVSS: '7'
+        continueOnError: true
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish dependency report'
+        inputs:
+          PathtoPublish: '$(Common.TestResultsDirectory)/dependency-check'
+          ArtifactName: 'DependencyCheck'
+
+# ============================================
+# Stage 4: Container Build (Optional)
+# ============================================
+- ${{ if eq(parameters.containerize, true) }}:
+  - stage: ContainerBuild
+    displayName: 'Container Build'
+    dependsOn:
+    - Build
+    - Test
+    jobs:
+    - job: BuildImage
+      displayName: 'Build Container Image'
+      steps:
+      - task: Docker@2
+        displayName: 'Build image'
+        inputs:
+          containerRegistry: 'ACR-Connection'
+          repository: '${{ parameters.imageName }}'
+          command: 'build'
+          Dockerfile: '${{ parameters.projectPath }}/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)'
+          tags: |
+            $(version)
+            latest
+
+      # Scan image for vulnerabilities
+      - task: Bash@3
+        displayName: 'Scan image with Trivy'
+        inputs:
+          targetType: 'inline'
+          script: |
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest image \
+              --severity HIGH,CRITICAL \
+              --exit-code 1 \
+              ${{ parameters.imageName }}:$(version)
+
+      - task: Docker@2
+        displayName: 'Push image'
+        inputs:
+          containerRegistry: 'ACR-Connection'
+          repository: '${{ parameters.imageName }}'
+          command: 'push'
+          tags: |
+            $(version)
+            latest
+
+# ============================================
+# Build Summary
+# ============================================
+- stage: Summary
+  displayName: 'Build Summary'
+  dependsOn:
+  - Build
+  - ${{ if eq(parameters.runTests, true) }}:
+    - Test
+  - ${{ if eq(parameters.runCodeAnalysis, true) }}:
+    - CodeAnalysis
+  condition: always()
+  jobs:
+  - job: Summary
+    displayName: 'Generate Summary'
+    steps:
+    - task: Bash@3
+      displayName: 'Build summary'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "## Build Summary" >> $(System.DefaultWorkingDirectory)/summary.md
+          echo "- **Version:** $(version)" >> $(System.DefaultWorkingDirectory)/summary.md
+          echo "- **Build Number:** $(Build.BuildNumber)" >> $(System.DefaultWorkingDirectory)/summary.md
+          echo "- **Source Branch:** $(Build.SourceBranchName)" >> $(System.DefaultWorkingDirectory)/summary.md
+          echo "- **Commit:** $(Build.SourceVersion)" >> $(System.DefaultWorkingDirectory)/summary.md
+          echo "" >> $(System.DefaultWorkingDirectory)/summary.md
+          cat $(System.DefaultWorkingDirectory)/summary.md
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish summary'
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/summary.md'
+        ArtifactName: 'BuildSummary'

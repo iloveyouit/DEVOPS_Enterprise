@@ -1,5 +1,7 @@
 # Azure DevOps Enterprise Implementation Checklist for 143it
 
+> **Related:** [Architecture Plan](azure_devops_architecture_plan.md) | [Security Baseline](security_baseline.md) | [Change Management](change_management.md)
+
 ---
 
 ## RACI Matrix

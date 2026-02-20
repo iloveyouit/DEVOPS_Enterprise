@@ -1,0 +1,243 @@
+# Standard CD Release Pipeline Template
+# 143it Azure DevOps Enterprise
+#
+# Usage:
+#   - template: templates/pipeline-release-template.yml
+#     parameters:
+#       appName: 'myapp'
+#       environments: ['dev', 'staging', 'production']
+
+parameters:
+- name: appName
+  type: string
+  displayName: 'Application name'
+
+- name: resourceGroup
+  type: string
+  displayName: 'Azure resource group'
+
+- name: artifactName
+  type: string
+  default: 'drop'
+  displayName: 'Build artifact name'
+
+- name: environments
+  type: object
+  default:
+  - name: 'dev'
+    azureSubscription: 'Azure-Dev'
+    requiresApproval: false
+    healthCheckUrl: 'https://myapp-dev.azurewebsites.net/health'
+  - name: 'staging'
+    azureSubscription: 'Azure-Staging'
+    requiresApproval: true
+    approvers: 'qa-team@143it.com'
+    healthCheckUrl: 'https://myapp-staging.azurewebsites.net/health'
+  - name: 'production'
+    azureSubscription: 'Azure-Production'
+    requiresApproval: true
+    approvers: 'devops-cab@143it.com'
+    healthCheckUrl: 'https://myapp.143it.com/health'
+
+- name: deploymentStrategy
+  type: string
+  default: 'rolling'
+  values:
+  - 'rolling'
+  - 'blue-green'
+  - 'canary'
+
+- name: runSmokeTests
+  type: boolean
+  default: true
+
+- name: runLoadTests
+  type: boolean
+  default: false
+
+trigger: none  # Release pipeline - manual or scheduled only
+
+resources:
+  pipelines:
+  - pipeline: 'build'
+    source: 'CI-Build-Pipeline'
+    trigger:
+      branches:
+        include:
+        - main
+
+variables:
+  isProduction: $[eq(variables['environment'], 'production')]
+
+stages:
+# ============================================
+# Deploy to each environment
+# ============================================
+- ${{ each env in parameters.environments }}:
+  - stage: Deploy_${{ env.name }}
+    displayName: 'Deploy to ${{ env.name }}'
+    ${{ if ne(env.dependsOn, '') }}:
+      dependsOn: ${{ env.dependsOn }}
+    ${{ else }}:
+      ${{ if eq(env.name, 'dev') }}:
+        dependsOn: []
+      ${{ if eq(env.name, 'staging') }}:
+        dependsOn: Deploy_dev
+      ${{ if eq(env.name, 'production') }}:
+        dependsOn: Deploy_staging
+
+    jobs:
+    # Pre-deployment validation
+    - job: PreDeployValidation
+      displayName: 'Pre-deployment Validation'
+      steps:
+      - task: Bash@3
+        displayName: 'Validate deployment prerequisites'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "Validating deployment to ${{ env.name }}..."
+
+            # Check for blocking work items (production only)
+            if [ "${{ env.name }}" == "production" ]; then
+              echo "Checking for blocking issues..."
+              # Add actual check here
+            fi
+
+            echo "Pre-deployment validation passed"
+
+    # Deployment job
+    - deployment: Deploy
+      displayName: 'Deploy ${{ parameters.appName }}'
+      dependsOn: PreDeployValidation
+      environment: ${{ env.name }}
+      ${{ if eq(env.requiresApproval, true) }}:
+        # Approval configured at environment level in Azure DevOps
+      strategy:
+        ${{ if eq(parameters.deploymentStrategy, 'rolling') }}:
+          rolling:
+            maxParallel: 1
+            deploy:
+              steps:
+              - template: steps/deploy-app-service.yml
+                parameters:
+                  azureSubscription: ${{ env.azureSubscription }}
+                  appName: ${{ parameters.appName }}-${{ env.name }}
+                  resourceGroup: ${{ parameters.resourceGroup }}-${{ env.name }}
+                  artifactName: ${{ parameters.artifactName }}
+
+        ${{ if eq(parameters.deploymentStrategy, 'blue-green') }}:
+          runOnce:
+            deploy:
+              steps:
+              - template: steps/deploy-blue-green.yml
+                parameters:
+                  azureSubscription: ${{ env.azureSubscription }}
+                  appName: ${{ parameters.appName }}-${{ env.name }}
+                  resourceGroup: ${{ parameters.resourceGroup }}-${{ env.name }}
+                  artifactName: ${{ parameters.artifactName }}
+
+        ${{ if eq(parameters.deploymentStrategy, 'canary') }}:
+          canary:
+            increments: [10, 50, 100]
+            deploy:
+              steps:
+              - template: steps/deploy-canary.yml
+                parameters:
+                  azureSubscription: ${{ env.azureSubscription }}
+                  appName: ${{ parameters.appName }}-${{ env.name }}
+                  resourceGroup: ${{ parameters.resourceGroup }}-${{ env.name }}
+                  artifactName: ${{ parameters.artifactName }}
+                  percentage: $(strategy.increment)
+
+    # Post-deployment validation
+    - job: PostDeployValidation
+      displayName: 'Post-deployment Validation'
+      dependsOn: Deploy
+      steps:
+      - task: Bash@3
+        displayName: 'Health check'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "Checking health endpoint..."
+            for i in {1..12}; do
+              response=$(curl -s -o /dev/null -w "%{http_code}" "${{ env.healthCheckUrl }}")
+              if [ "$response" == "200" ]; then
+                echo "Health check passed"
+                exit 0
+              fi
+              echo "Attempt $i: Got $response, retrying in 5s..."
+              sleep 5
+            done
+            echo "Health check failed after 60 seconds"
+            exit 1
+
+      - ${{ if eq(parameters.runSmokeTests, true) }}:
+        - task: Bash@3
+          displayName: 'Run smoke tests'
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "Running smoke tests against ${{ env.name }}..."
+              npm run test:smoke -- --url ${{ env.healthCheckUrl }}
+
+    # Load testing (staging/production only)
+    - ${{ if and(eq(parameters.runLoadTests, true), or(eq(env.name, 'staging'), eq(env.name, 'production'))) }}:
+      - job: LoadTest
+        displayName: 'Load Testing'
+        dependsOn: PostDeployValidation
+        steps:
+        - task: Bash@3
+          displayName: 'Run load tests'
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "Running load tests..."
+              # k6 or Azure Load Testing
+              k6 run --vus 50 --duration 5m load-tests/baseline.js
+
+# ============================================
+# Deployment notification
+# ============================================
+- stage: Notify
+  displayName: 'Deployment Notification'
+  dependsOn:
+  - ${{ each env in parameters.environments }}:
+    - Deploy_${{ env.name }}
+  condition: always()
+  jobs:
+  - job: SendNotification
+    steps:
+    - task: Bash@3
+      displayName: 'Send deployment notification'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Determine overall status
+          if [ "$(Agent.JobStatus)" == "Succeeded" ]; then
+            status="✅ Success"
+            color="00FF00"
+          else
+            status="❌ Failed"
+            color="FF0000"
+          fi
+
+          # Send to Teams (if webhook configured)
+          if [ -n "$(TEAMS_WEBHOOK_URL)" ]; then
+            curl -X POST "$(TEAMS_WEBHOOK_URL)" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "@type": "MessageCard",
+                "themeColor": "'$color'",
+                "summary": "Deployment '$status'",
+                "sections": [{
+                  "activityTitle": "Deployment: ${{ parameters.appName }}",
+                  "facts": [
+                    {"name": "Status", "value": "'$status'"},
+                    {"name": "Version", "value": "$(Build.BuildNumber)"},
+                    {"name": "Deployed by", "value": "$(Build.RequestedFor)"}
+                  ]
+                }]
+              }'
+          fi

@@ -1,5 +1,9 @@
 # Security Baseline — 143it Azure DevOps
 
+> **Related:** [Security Controls Implementation](security_controls_implementation.md) | [Change Management](change_management.md) | [Disaster Recovery](disaster_recovery_plan.md)
+>
+> This document defines *what* security controls are required. For *how* to implement them, see [Security Controls Implementation](security_controls_implementation.md).
+
 ## 1. Identity & Access Management
 
 ### Azure AD Integration

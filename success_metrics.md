@@ -1,5 +1,7 @@
 # Success Metrics & KPIs — 143it Azure DevOps
 
+> **Related:** [Monitoring Plan](monitoring_plan.md) | [Testing Strategy](testing_strategy.md) | [Deployment Strategy](deployment_strategy.md)
+
 ## 1. DORA Metrics (DevOps Research & Assessment)
 
 The four key metrics that define elite DevOps performance:
@@ -94,3 +96,75 @@ The four key metrics that define elite DevOps performance:
 - [ ] Configure automated dashboard for DORA metrics
 - [ ] Present first quarterly maturity assessment
 - [ ] Adjust targets based on team capacity and trajectory
+
+## 8. Baseline Calculation Procedures
+
+### Deployment Frequency Calculation
+
+```kusto
+// Azure DevOps Analytics query
+PipelineRuns
+| where CompletedDate > ago(30d)
+| where PipelineName contains "Production"
+| where Result == "Succeeded"
+| summarize DeploymentCount = count() by bin(CompletedDate, 1d)
+| summarize
+    TotalDeployments = sum(DeploymentCount),
+    DailyAverage = avg(DeploymentCount)
+```
+
+**Manual calculation:**
+- Count production deployments over 30 days
+- Calculate: `Frequency = TotalDeployments / 30 days`
+
+### Lead Time for Changes Calculation
+
+```kusto
+// Measure commit to production time
+PipelineRuns
+| where CompletedDate > ago(30d)
+| where PipelineName contains "Production"
+| where Result == "Succeeded"
+| extend LeadTime = CompletedDate - QueuedDate
+| summarize
+    AvgLeadTime = avg(LeadTime),
+    P50LeadTime = percentile(LeadTime, 50),
+    P95LeadTime = percentile(LeadTime, 95)
+```
+
+### Change Failure Rate Calculation
+
+```
+Change Failure Rate = (Failed Deployments + Hotfixes + Rollbacks) / Total Deployments × 100
+```
+
+**What counts as failure:**
+- Deployment causes production incident
+- Immediate rollback required
+- Hotfix deployed within 24 hours of release
+
+### MTTR Calculation
+
+```
+MTTR = Total Downtime / Number of Incidents
+```
+
+**Measurement:**
+- Track from incident detection to service restoration
+- Use incident timestamps from [Operational Runbooks](operational_runbooks.md)
+- Include only Sev 0-2 incidents
+
+## 9. Dashboard Configuration
+
+See [Monitoring Plan](monitoring_plan.md) for detailed dashboard setup instructions.
+
+### Recommended Widgets
+
+| Widget | Data Source | Refresh |
+|--------|-------------|---------|
+| Deployment Frequency | Pipeline Analytics | Daily |
+| Lead Time Trend | Pipeline Analytics | Daily |
+| Change Failure Rate | Incident + Deploy data | Weekly |
+| MTTR Trend | Incident data | Weekly |
+| Code Coverage | Build artifacts | Per build |
+| Sprint Burndown | Azure Boards | Real-time |
