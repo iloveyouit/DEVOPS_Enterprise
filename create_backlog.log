@@ -1,0 +1,100 @@
+Creating Feature: Phase 3: Work Item Configuration
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Configure Epics, Features, User Stories, Tasks, Bugs, Impediments
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Add custom fields, Configure field rules, Set up picklists
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Configure portfolio backlogs, Set up requirement hierarchy, Configure backlog levels
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 4: Sprint Planning Setup
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create first sprint, Set sprint capacity, Configure sprint burndown
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Set up sprint review & retrospectives
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Define state transitions, workflow rules, auto-state changes
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 5: Kanban Board Configuration
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Configure Dev, QA, Ops boards and columns
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Set WIP limits per column, Configure swimlanes
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Set up card colors, styling, age indicators
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Enable cumulative flow, configure forecast, card annotations
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 6: Repository Configuration
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create main repository, Set up branch strategy, Configure branch policies
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create PR templates, Set up branch permissions
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Connect GitHub organization, Authorize repositories, Configure service connections
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 7: Pipeline Configuration
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create build pipeline template, Configure CI triggers
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Set up agent configuration, test integration, code coverage
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create release pipeline, Configure environments (Dev/Staging/Prod)
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Set up approval gates, variable groups, secret management
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Configure IaC deployment, Implement immutable artifact strategy
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 8: Dashboards & Reporting
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create team dashboard, Add standard widgets (burndown, CFD, etc.)
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Create portfolio dashboard, Configure rollup views
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 9: Extensions & Integrations
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Install recommended extensions (Pipelines, Test, Wiki, Analytics)
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Install Slack/Teams integrations
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Configure third-party integrations (GitHub, ServiceNow, Monitoring)
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Creating Feature: Phase 10: Governance & Operations
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Review audit logs, Configure security policies, compliance reporting
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+  Creating User Story: Document operational procedures (sprint planning, release process, incident response)
+/Users/me/.azure/cliextensions/azure-devops/azext_devops/dev/__init__.py:5: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Done populating backlog.

@@ -2,18 +2,18 @@
 
 > **Related:** [Security Controls Implementation](security_controls_implementation.md) | [Change Management](change_management.md) | [Disaster Recovery](disaster_recovery_plan.md)
 >
-> This document defines *what* security controls are required. For *how* to implement them, see [Security Controls Implementation](security_controls_implementation.md).
+> This document defines _what_ security controls are required. For _how_ to implement them, see [Security Controls Implementation](security_controls_implementation.md).
 
 ## 1. Identity & Access Management
 
 ### Azure AD Integration
 
-| Setting             | Configuration                               |
-| ------------------- | ------------------------------------------- |
-| **Authentication**  | Azure AD SSO via 143it.com                  |
-| **MFA**             | Required for all users (Conditional Access) |
-| **Guest Access**    | Disabled by default, exception-based        |
-| **Session Timeout** | 8 hours inactive, 24 hours maximum          |
+| Setting             | Configuration                                             |
+| ------------------- | --------------------------------------------------------- |
+| **Authentication**  | Azure AD SSO via 143it.com                                |
+| **MFA**             | Required for all users (Conditional Access — Azure AD P1) |
+| **Guest Access**    | Disabled by default, exception-based                      |
+| **Session Timeout** | 8 hours inactive, 24 hours maximum                        |
 
 ### Azure AD Security Groups → Azure DevOps Mapping
 
@@ -29,17 +29,19 @@
 ### Principle of Least Privilege
 
 - No individual user permissions — all access through groups
-- Elevate permissions only for the duration needed (JIT where possible)
+- Elevate permissions only for the duration needed (use time-boxed elevated access procedure — see [Security Controls §7.1](security_controls_implementation.md))
 - Review access quarterly
 
-## 2. Conditional Access Policies
+## 2. Conditional Access Policies (Azure AD P1)
 
-| Policy                | Target    | Conditions                 | Grant                     |
-| --------------------- | --------- | -------------------------- | ------------------------- |
-| **Require MFA**       | All users | All cloud apps             | MFA required              |
-| **Block legacy auth** | All users | Legacy auth clients        | Block                     |
-| **Compliant devices** | Admins    | Azure DevOps, Azure portal | Compliant device required |
-| **Trusted locations** | All users | Outside corporate network  | MFA + compliant device    |
+| Policy                | Target    | Conditions                 | Grant                         |
+| --------------------- | --------- | -------------------------- | ----------------------------- |
+| **Require MFA**       | All users | All cloud apps             | MFA required                  |
+| **Block legacy auth** | All users | Legacy auth clients        | Block                         |
+| **Trusted locations** | All users | Outside corporate network  | MFA required                  |
+| **Admin MFA**         | Admins    | Azure DevOps, Azure portal | MFA + named location required |
+
+> **Note:** Device compliance policies (requiring Intune / M365 E3) are not available with Azure AD P1. Trusted network locations combined with MFA provide an equivalent risk-reduction layer.
 
 ## 3. Azure DevOps Security Policies
 

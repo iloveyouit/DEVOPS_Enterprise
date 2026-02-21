@@ -4,7 +4,7 @@
 
 | Component           | Current State                                  |
 | ------------------- | ---------------------------------------------- |
-| **Azure AD / M365** | Active under 143it.com                         |
+| **Azure AD (P1)**   | Active under 143it.com                         |
 | **Azure DevOps**    | Organization exists, needs restructuring       |
 | **GitHub**          | Exists under github.com/iloveyouit (NOT 143it) |
 | **Primary Project** | Head_Office (gold standard)                    |
@@ -30,7 +30,7 @@ graph TB
             F[Repo Migration Plan]
         end
 
-        G[M365 Services]
+        G[Azure AD P1 Services]
     end
 
     A --> B

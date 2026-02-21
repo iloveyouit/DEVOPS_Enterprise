@@ -121,12 +121,14 @@ graph TB
 
 ## 6. Log Management
 
-| Source                    | Destination        | Retention |
-| ------------------------- | ------------------ | --------- |
-| Application logs          | Log Analytics      | 90 days   |
-| Infrastructure logs       | Log Analytics      | 30 days   |
-| Audit logs (Azure DevOps) | Log Analytics      | 1 year    |
-| Security logs             | Microsoft Sentinel | 2 years   |
+| Source                    | Destination   | Retention |
+| ------------------------- | ------------- | --------- |
+| Application logs          | Log Analytics | 90 days   |
+| Infrastructure logs       | Log Analytics | 30 days   |
+| Audit logs (Azure DevOps) | Log Analytics | 1 year    |
+| Security logs             | Log Analytics | 2 years   |
+
+> **Note:** Microsoft Sentinel provides advanced SIEM capabilities but requires M365 E5 or a standalone Sentinel license. Log Analytics provides adequate log storage and querying for the current P1 licensing tier. Consider upgrading to Sentinel when the security operations maturity increases.
 
 ## 7. Roles & Responsibilities
 

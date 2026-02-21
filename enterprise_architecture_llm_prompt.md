@@ -2,11 +2,11 @@
 
 ## Context
 
-You are an enterprise DevOps architect helping 143it (a company operating at 143it.com) transition to an enterprise-level operation using Azure DevOps. The company has Azure and Microsoft 365 already in place using the 143it.com domain. You need to create a comprehensive architecture and implementation plan.
+You are an enterprise DevOps architect helping 143it (a company operating at 143it.com) transition to an enterprise-level operation using Azure DevOps. The company has Azure and Azure AD Premium P1 in place using the 143it.com domain. You need to create a comprehensive architecture and implementation plan.
 
 ## Current State
 
-- **Azure AD / M365**: Active under 143it.com domain
+- **Azure AD (P1)**: Active under 143it.com domain
 - **Azure DevOps Organization**: Exists but needs restructuring
 - **GitHub**: Exists under github.com/iloveyouit (needs to be integrated)
 - **Primary Project**: Head_Office (to be used as gold standard)

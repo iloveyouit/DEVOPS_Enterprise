@@ -2,7 +2,7 @@
 
 > **Related:** [Security Baseline](security_baseline.md) | [Disaster Recovery](disaster_recovery_plan.md) | [Monitoring Plan](monitoring_plan.md)
 
-This document provides detailed implementation procedures for security controls. The [Security Baseline](security_baseline.md) defines *what* security measures are required; this guide explains *how* to implement them.
+This document provides detailed implementation procedures for security controls. The [Security Baseline](security_baseline.md) defines _what_ security measures are required; this guide explains _how_ to implement them.
 
 ---
 
@@ -10,13 +10,13 @@ This document provides detailed implementation procedures for security controls.
 
 ### 1.1 Encryption at Rest
 
-| Component | Encryption Method | Key Management |
-|-----------|-------------------|----------------|
-| Azure Repos | Azure Storage Service Encryption (SSE) | Microsoft-managed keys (default) |
-| Azure Artifacts | Azure Storage SSE | Microsoft-managed keys |
-| Azure Boards (Work Items) | Azure SQL TDE | Microsoft-managed keys |
-| Backup Storage | Azure Storage SSE + customer key | Azure Key Vault (CMK) |
-| Database (App Data) | Azure SQL TDE | Customer-managed key in Key Vault |
+| Component                 | Encryption Method                      | Key Management                    |
+| ------------------------- | -------------------------------------- | --------------------------------- |
+| Azure Repos               | Azure Storage Service Encryption (SSE) | Microsoft-managed keys (default)  |
+| Azure Artifacts           | Azure Storage SSE                      | Microsoft-managed keys            |
+| Azure Boards (Work Items) | Azure SQL TDE                          | Microsoft-managed keys            |
+| Backup Storage            | Azure Storage SSE + customer key       | Azure Key Vault (CMK)             |
+| Database (App Data)       | Azure SQL TDE                          | Customer-managed key in Key Vault |
 
 **Implementation:**
 
@@ -38,13 +38,13 @@ az sql server tde-key set \
 
 ### 1.2 Encryption in Transit
 
-| Connection | Protocol | Minimum Version |
-|------------|----------|-----------------|
-| Azure DevOps API | HTTPS | TLS 1.2 |
-| Azure Portal | HTTPS | TLS 1.2 |
-| Git operations | HTTPS or SSH | TLS 1.2 / SSH-2 |
-| Database connections | TLS | TLS 1.2 |
-| Internal service communication | mTLS | TLS 1.2 |
+| Connection                     | Protocol     | Minimum Version |
+| ------------------------------ | ------------ | --------------- |
+| Azure DevOps API               | HTTPS        | TLS 1.2         |
+| Azure Portal                   | HTTPS        | TLS 1.2         |
+| Git operations                 | HTTPS or SSH | TLS 1.2 / SSH-2 |
+| Database connections           | TLS          | TLS 1.2         |
+| Internal service communication | mTLS         | TLS 1.2         |
 
 **Enforcement:**
 
@@ -54,13 +54,13 @@ az sql server tde-key set \
 
 ### 1.3 Key Management
 
-| Key Type | Rotation Period | Storage |
-|----------|-----------------|---------|
-| TDE keys | Annual | Azure Key Vault (HSM-backed) |
-| API keys | 90 days | Azure Key Vault |
-| Service Principal secrets | 90 days | Azure Key Vault |
-| SSL/TLS certificates | Annual (auto-renew) | Azure Key Vault |
-| PATs | 90 days max | Azure DevOps (user-managed) |
+| Key Type                  | Rotation Period     | Storage                      |
+| ------------------------- | ------------------- | ---------------------------- |
+| TDE keys                  | Annual              | Azure Key Vault (HSM-backed) |
+| API keys                  | 90 days             | Azure Key Vault              |
+| Service Principal secrets | 90 days             | Azure Key Vault              |
+| SSL/TLS certificates      | Annual (auto-renew) | Azure Key Vault              |
+| PATs                      | 90 days max         | Azure DevOps (user-managed)  |
 
 **Key Vault Configuration:**
 
@@ -97,38 +97,38 @@ az monitor diagnostic-settings create \
 # azure-pipelines.yml - SAST stage
 - stage: SAST
   jobs:
-  - job: SonarScan
-    steps:
-    - task: SonarQubePrepare@5
-      inputs:
-        SonarQube: 'SonarQube-ServiceConnection'
-        scannerMode: 'MSBuild'
-        projectKey: '$(Build.Repository.Name)'
-        projectName: '$(Build.Repository.Name)'
-        extraProperties: |
-          sonar.coverage.exclusions=**/tests/**
-          sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
+    - job: SonarScan
+      steps:
+        - task: SonarQubePrepare@5
+          inputs:
+            SonarQube: "SonarQube-ServiceConnection"
+            scannerMode: "MSBuild"
+            projectKey: "$(Build.Repository.Name)"
+            projectName: "$(Build.Repository.Name)"
+            extraProperties: |
+              sonar.coverage.exclusions=**/tests/**
+              sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'build'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: "build"
 
-    - task: SonarQubeAnalyze@5
+        - task: SonarQubeAnalyze@5
 
-    - task: SonarQubePublish@5
-      inputs:
-        pollingTimeoutSec: '300'
+        - task: SonarQubePublish@5
+          inputs:
+            pollingTimeoutSec: "300"
 ```
 
 **Quality Gate Criteria (Blocking):**
 
-| Metric | Threshold | Action |
-|--------|-----------|--------|
-| Critical vulnerabilities | 0 | Block PR merge |
-| High vulnerabilities | 0 | Block PR merge |
-| Medium vulnerabilities | ≤ 5 (new code) | Warning |
-| Code coverage | ≥ 80% | Block PR merge |
-| Duplicated lines | < 3% | Warning |
+| Metric                   | Threshold      | Action         |
+| ------------------------ | -------------- | -------------- |
+| Critical vulnerabilities | 0              | Block PR merge |
+| High vulnerabilities     | 0              | Block PR merge |
+| Medium vulnerabilities   | ≤ 5 (new code) | Warning        |
+| Code coverage            | ≥ 80%          | Block PR merge |
+| Duplicated lines         | < 3%           | Warning        |
 
 ### 2.2 Dynamic Application Security Testing (DAST)
 
@@ -141,40 +141,40 @@ az monitor diagnostic-settings create \
 - stage: DAST
   dependsOn: DeployStaging
   jobs:
-  - job: ZAPScan
-    steps:
-    - task: Bash@3
-      displayName: 'Run OWASP ZAP Scan'
-      inputs:
-        targetType: 'inline'
-        script: |
-          docker run --rm \
-            -v $(System.DefaultWorkingDirectory)/reports:/zap/wrk:rw \
-            owasp/zap2docker-stable zap-full-scan.py \
-            -t https://$(STAGING_URL) \
-            -r zap-report.html \
-            -x zap-report.xml \
-            -c zap-rules.conf
+    - job: ZAPScan
+      steps:
+        - task: Bash@3
+          displayName: "Run OWASP ZAP Scan"
+          inputs:
+            targetType: "inline"
+            script: |
+              docker run --rm \
+                -v $(System.DefaultWorkingDirectory)/reports:/zap/wrk:rw \
+                owasp/zap2docker-stable zap-full-scan.py \
+                -t https://$(STAGING_URL) \
+                -r zap-report.html \
+                -x zap-report.xml \
+                -c zap-rules.conf
 
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'NUnit'
-        testResultsFiles: '**/zap-report.xml'
+        - task: PublishTestResults@2
+          inputs:
+            testResultsFormat: "NUnit"
+            testResultsFiles: "**/zap-report.xml"
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/reports'
-        ArtifactName: 'DAST-Reports'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: "$(System.DefaultWorkingDirectory)/reports"
+            ArtifactName: "DAST-Reports"
 ```
 
 **Blocking Criteria:**
 
-| Risk Level | Action |
-|------------|--------|
-| High | Block deployment to Production |
-| Medium | Require security team approval |
-| Low | Document and track |
-| Informational | Log only |
+| Risk Level    | Action                         |
+| ------------- | ------------------------------ |
+| High          | Block deployment to Production |
+| Medium        | Require security team approval |
+| Low           | Document and track             |
+| Informational | Log only                       |
 
 ### 2.3 Software Composition Analysis (SCA)
 
@@ -186,39 +186,39 @@ az monitor diagnostic-settings create \
 # SCA stage
 - stage: SCA
   jobs:
-  - job: DependencyCheck
-    steps:
-    - task: dependency-check-build-task@6
-      inputs:
-        projectName: '$(Build.Repository.Name)'
-        scanPath: '$(Build.SourcesDirectory)'
-        format: 'HTML,JSON'
-        failOnCVSS: '7'  # Fail on High/Critical
-        enableExperimental: true
+    - job: DependencyCheck
+      steps:
+        - task: dependency-check-build-task@6
+          inputs:
+            projectName: "$(Build.Repository.Name)"
+            scanPath: "$(Build.SourcesDirectory)"
+            format: "HTML,JSON"
+            failOnCVSS: "7" # Fail on High/Critical
+            enableExperimental: true
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Common.TestResultsDirectory)/dependency-check'
-        ArtifactName: 'SCA-Reports'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: "$(Common.TestResultsDirectory)/dependency-check"
+            ArtifactName: "SCA-Reports"
 ```
 
 **Vulnerability SLAs:**
 
 | Severity | CVSS Score | Remediation SLA |
-|----------|------------|-----------------|
-| Critical | 9.0 - 10.0 | 24 hours |
-| High | 7.0 - 8.9 | 7 days |
-| Medium | 4.0 - 6.9 | 30 days |
-| Low | 0.1 - 3.9 | 90 days |
+| -------- | ---------- | --------------- |
+| Critical | 9.0 - 10.0 | 24 hours        |
+| High     | 7.0 - 8.9  | 7 days          |
+| Medium   | 4.0 - 6.9  | 30 days         |
+| Low      | 0.1 - 3.9  | 90 days         |
 
 ### 2.4 Patch Management
 
-| Component | Scan Frequency | Patch Window |
-|-----------|----------------|--------------|
-| Container base images | Daily | Weekly (non-prod), Monthly (prod) |
-| OS packages | Daily | Weekly |
-| Application dependencies | On each build | With code changes |
-| Infrastructure (IaC) | Weekly | Monthly |
+| Component                | Scan Frequency | Patch Window                      |
+| ------------------------ | -------------- | --------------------------------- |
+| Container base images    | Daily          | Weekly (non-prod), Monthly (prod) |
+| OS packages              | Daily          | Weekly                            |
+| Application dependencies | On each build  | With code changes                 |
+| Infrastructure (IaC)     | Weekly         | Monthly                           |
 
 ---
 
@@ -230,9 +230,9 @@ az monitor diagnostic-settings create \
 
 ```yaml
 - task: Bash@3
-  displayName: 'Generate SBOM'
+  displayName: "Generate SBOM"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       # Install SBOM tool
       dotnet tool install --global Microsoft.Sbom.DotNetTool
@@ -248,8 +248,8 @@ az monitor diagnostic-settings create \
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/_manifest'
-    ArtifactName: 'SBOM'
+    PathtoPublish: "$(Build.ArtifactStagingDirectory)/_manifest"
+    ArtifactName: "SBOM"
 ```
 
 **SBOM Storage:**
@@ -264,11 +264,11 @@ az monitor diagnostic-settings create \
 
 ```yaml
 - task: AzureCLI@2
-  displayName: 'Sign Container Image'
+  displayName: "Sign Container Image"
   inputs:
-    azureSubscription: 'Production'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
+    azureSubscription: "Production"
+    scriptType: "bash"
+    scriptLocation: "inlineScript"
     inlineScript: |
       # Sign with Azure Key Vault key
       notation sign \
@@ -323,9 +323,9 @@ az artifacts universal package publish \
 ```yaml
 # Generate build provenance
 - task: Bash@3
-  displayName: 'Generate Provenance'
+  displayName: "Generate Provenance"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       cat > provenance.json << EOF
       {
@@ -385,37 +385,37 @@ az artifacts universal package publish \
 
 **Web Tier NSG:**
 
-| Priority | Direction | Source | Destination | Port | Action |
-|----------|-----------|--------|-------------|------|--------|
-| 100 | Inbound | Internet | VNet | 443 | Allow |
-| 110 | Inbound | AzureLoadBalancer | VNet | Any | Allow |
-| 4096 | Inbound | Any | Any | Any | Deny |
+| Priority | Direction | Source            | Destination | Port | Action |
+| -------- | --------- | ----------------- | ----------- | ---- | ------ |
+| 100      | Inbound   | Internet          | VNet        | 443  | Allow  |
+| 110      | Inbound   | AzureLoadBalancer | VNet        | Any  | Allow  |
+| 4096     | Inbound   | Any               | Any         | Any  | Deny   |
 
 **App Tier NSG:**
 
-| Priority | Direction | Source | Destination | Port | Action |
-|----------|-----------|--------|-------------|------|--------|
-| 100 | Inbound | WebSubnet | AppSubnet | 8080 | Allow |
-| 110 | Inbound | AzureDevOps | AppSubnet | 443 | Allow |
-| 4096 | Inbound | Any | Any | Any | Deny |
+| Priority | Direction | Source      | Destination | Port | Action |
+| -------- | --------- | ----------- | ----------- | ---- | ------ |
+| 100      | Inbound   | WebSubnet   | AppSubnet   | 8080 | Allow  |
+| 110      | Inbound   | AzureDevOps | AppSubnet   | 443  | Allow  |
+| 4096     | Inbound   | Any         | Any         | Any  | Deny   |
 
 **Data Tier NSG:**
 
-| Priority | Direction | Source | Destination | Port | Action |
-|----------|-----------|--------|-------------|------|--------|
-| 100 | Inbound | AppSubnet | DataSubnet | 1433 | Allow |
-| 4096 | Inbound | Any | Any | Any | Deny |
+| Priority | Direction | Source    | Destination | Port | Action |
+| -------- | --------- | --------- | ----------- | ---- | ------ |
+| 100      | Inbound   | AppSubnet | DataSubnet  | 1433 | Allow  |
+| 4096     | Inbound   | Any       | Any         | Any  | Deny   |
 
 ### 4.3 Private Endpoints
 
 **Required Private Endpoints:**
 
-| Service | Private Endpoint | DNS Zone |
-|---------|------------------|----------|
-| Azure SQL | pe-sql-prod | privatelink.database.windows.net |
-| Key Vault | pe-kv-prod | privatelink.vaultcore.azure.net |
-| Storage Account | pe-storage-prod | privatelink.blob.core.windows.net |
-| Container Registry | pe-acr-prod | privatelink.azurecr.io |
+| Service            | Private Endpoint | DNS Zone                          |
+| ------------------ | ---------------- | --------------------------------- |
+| Azure SQL          | pe-sql-prod      | privatelink.database.windows.net  |
+| Key Vault          | pe-kv-prod       | privatelink.vaultcore.azure.net   |
+| Storage Account    | pe-storage-prod  | privatelink.blob.core.windows.net |
+| Container Registry | pe-acr-prod      | privatelink.azurecr.io            |
 
 **Implementation:**
 
@@ -475,12 +475,12 @@ az network vnet subnet create \
 
 **Approved Base Images:**
 
-| Language/Runtime | Approved Image | Source |
-|------------------|----------------|--------|
-| .NET | mcr.microsoft.com/dotnet/aspnet:8.0-alpine | Microsoft |
-| Node.js | mcr.microsoft.com/cbl-mariner/base/nodejs:18 | Microsoft |
-| Python | mcr.microsoft.com/cbl-mariner/base/python:3.11 | Microsoft |
-| Java | mcr.microsoft.com/openjdk/jdk:17-mariner | Microsoft |
+| Language/Runtime | Approved Image                                 | Source    |
+| ---------------- | ---------------------------------------------- | --------- |
+| .NET             | mcr.microsoft.com/dotnet/aspnet:8.0-alpine     | Microsoft |
+| Node.js          | mcr.microsoft.com/cbl-mariner/base/nodejs:18   | Microsoft |
+| Python           | mcr.microsoft.com/cbl-mariner/base/python:3.11 | Microsoft |
+| Java             | mcr.microsoft.com/openjdk/jdk:17-mariner       | Microsoft |
 
 **Base Image Requirements:**
 
@@ -495,9 +495,9 @@ az network vnet subnet create \
 
 ```yaml
 - task: Bash@3
-  displayName: 'Scan Container Image'
+  displayName: "Scan Container Image"
   inputs:
-    targetType: 'inline'
+    targetType: "inline"
     script: |
       # Scan for vulnerabilities
       trivy image \
@@ -516,18 +516,18 @@ az network vnet subnet create \
 
 - task: PublishTestResults@2
   inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'trivy-results.xml'
+    testResultsFormat: "JUnit"
+    testResultsFiles: "trivy-results.xml"
 ```
 
 **Blocking Criteria:**
 
-| Finding | Action |
-|---------|--------|
-| Critical CVE | Block build |
+| Finding                     | Action                     |
+| --------------------------- | -------------------------- |
+| Critical CVE                | Block build                |
 | High CVE (no fix available) | Require exception approval |
-| Root user | Block build |
-| Secrets in image | Block build |
+| Root user                   | Block build                |
+| Secrets in image            | Block build                |
 
 ### 5.3 Registry Security
 
@@ -588,41 +588,41 @@ securityContext:
 
 ```yaml
 schedules:
-- cron: "0 2 1 */3 *"  # Quarterly at 2 AM on 1st
-  displayName: 'Quarterly SP Rotation'
-  branches:
-    include:
-    - main
+  - cron: "0 2 1 */3 *" # Quarterly at 2 AM on 1st
+    displayName: "Quarterly SP Rotation"
+    branches:
+      include:
+        - main
 
 stages:
-- stage: RotateSecrets
-  jobs:
-  - job: RotateServicePrincipal
-    steps:
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'Admin-Connection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          # Generate new credential
-          NEW_SECRET=$(az ad sp credential reset \
-            --id $SP_APP_ID \
-            --credential-description "Rotated-$(date +%Y%m%d)" \
-            --query password -o tsv)
+  - stage: RotateSecrets
+    jobs:
+      - job: RotateServicePrincipal
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: "Admin-Connection"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                # Generate new credential
+                NEW_SECRET=$(az ad sp credential reset \
+                  --id $SP_APP_ID \
+                  --credential-description "Rotated-$(date +%Y%m%d)" \
+                  --query password -o tsv)
 
-          # Update Key Vault
-          az keyvault secret set \
-            --vault-name $KEYVAULT \
-            --name sp-client-secret \
-            --value "$NEW_SECRET"
+                # Update Key Vault
+                az keyvault secret set \
+                  --vault-name $KEYVAULT \
+                  --name sp-client-secret \
+                  --value "$NEW_SECRET"
 
-          # Update Azure DevOps service connection
-          az devops service-endpoint update \
-            --id $SERVICE_ENDPOINT_ID \
-            --org https://dev.azure.com/143it \
-            --project Head_Office \
-            --authorization-parameters "serviceprincipalkey=$NEW_SECRET"
+                # Update Azure DevOps service connection
+                az devops service-endpoint update \
+                  --id $SERVICE_ENDPOINT_ID \
+                  --org https://dev.azure.com/143it \
+                  --project Head_Office \
+                  --authorization-parameters "serviceprincipalkey=$NEW_SECRET"
 ```
 
 ### 6.2 Leaked Secret Response
@@ -685,16 +685,56 @@ az monitor scheduled-query create \
 
 ## 7. Access Control Procedures
 
-### 7.1 Just-In-Time (JIT) Access
+### 7.1 Time-Boxed Elevated Access (Manual — Azure AD P1)
 
-**Azure PIM Configuration:**
+> **Note:** Azure PIM (Privileged Identity Management) requires Azure AD P2. The following manual process provides equivalent controls using Azure AD P1 security groups and documented procedures.
 
-| Role | Eligible Duration | Activation Max | Approval Required |
-|------|-------------------|----------------|-------------------|
-| Contributor (Prod) | 8 hours | 4 hours | Yes (Manager) |
-| Key Vault Admin | 8 hours | 2 hours | Yes (Security) |
-| SQL Admin | 8 hours | 2 hours | Yes (DBA Lead) |
-| DevOps Admin | Permanent (limited users) | N/A | N/A |
+**Elevated Access Procedure:**
+
+| Role               | Max Duration            | Approval Required   | Process                                      |
+| ------------------ | ----------------------- | ------------------- | -------------------------------------------- |
+| Contributor (Prod) | 4 hours                 | Yes (Manager)       | Add to `AzDO-ProdAccess` group, remove after |
+| Key Vault Admin    | 2 hours                 | Yes (Security Lead) | Add to `KV-Admins-Temp` group, remove after  |
+| SQL Admin          | 2 hours                 | Yes (DBA Lead)      | Add to `SQL-Admins-Temp` group, remove after |
+| DevOps Admin       | Permanent (max 2 users) | N/A                 | Standing access, audited quarterly           |
+
+**Request & Approval Workflow:**
+
+1. Engineer submits an Azure DevOps work item (Type: `Impediment`, Tag: `elevated-access`)
+2. Work item includes: reason, target system, estimated duration
+3. Approver reviews and adds engineer to the temporary Azure AD group
+4. Engineer performs the action and confirms completion on the work item
+5. Approver removes engineer from the temporary group and closes the work item
+6. Automated alert (Azure Monitor) fires if group membership exceeds the max duration
+
+**Automation — Scheduled Group Cleanup:**
+
+```bash
+# Run daily via Azure Automation Runbook or scheduled pipeline
+# Removes users from temporary elevated groups after max duration
+
+# List members of temp elevated groups
+TEMP_GROUPS=("KV-Admins-Temp" "SQL-Admins-Temp" "AzDO-ProdAccess")
+
+for GROUP_NAME in "${TEMP_GROUPS[@]}"; do
+  GROUP_ID=$(az ad group show --group "$GROUP_NAME" --query id -o tsv)
+
+  # Get members added more than 4 hours ago (check audit logs)
+  STALE_MEMBERS=$(az monitor activity-log list \
+    --start-time "$(date -d '-4 hours' -Iseconds)" \
+    --resource-group "$RG" \
+    --query "[?operationName.value=='Microsoft.Authorization/roleAssignments/write']" \
+    -o tsv)
+
+  # Remove stale members
+  for MEMBER_ID in $STALE_MEMBERS; do
+    az ad group member remove --group "$GROUP_ID" --member-id "$MEMBER_ID"
+    echo "Removed $MEMBER_ID from $GROUP_NAME (exceeded max duration)"
+  done
+done
+```
+
+> **Future upgrade path:** If the organization licenses Azure AD P2 in the future, migrate this process to Azure PIM for automated just-in-time access with built-in approval workflows and time-bound activation.
 
 ### 7.2 Break-Glass Procedures
 
@@ -717,15 +757,15 @@ az monitor scheduled-query create \
 
 ### 7.3 Offboarding Procedure
 
-| Timeline | Action | Owner |
-|----------|--------|-------|
-| Day 0 | Disable Azure AD account | IT |
-| Day 0 | Revoke all PATs | DevOps Admin |
-| Day 0 | Remove from Azure DevOps groups | Project Admin |
-| Day 0 | Rotate any shared secrets employee had access to | Security |
-| Day 1 | Review recent commits/changes | Team Lead |
-| Day 7 | Archive or reassign work items | Manager |
-| Day 30 | Delete Azure AD account | IT |
+| Timeline | Action                                           | Owner         |
+| -------- | ------------------------------------------------ | ------------- |
+| Day 0    | Disable Azure AD account                         | IT            |
+| Day 0    | Revoke all PATs                                  | DevOps Admin  |
+| Day 0    | Remove from Azure DevOps groups                  | Project Admin |
+| Day 0    | Rotate any shared secrets employee had access to | Security      |
+| Day 1    | Review recent commits/changes                    | Team Lead     |
+| Day 7    | Archive or reassign work items                   | Manager       |
+| Day 30   | Delete Azure AD account                          | IT            |
 
 ---
 
@@ -733,40 +773,40 @@ az monitor scheduled-query create \
 
 ### 8.1 SOC 2 Type II
 
-| Trust Service Criteria | Control | Implementation | Document |
-|------------------------|---------|----------------|----------|
-| CC6.1 | Logical access | Azure AD + MFA | security_baseline.md §1-2 |
-| CC6.2 | Access provisioning | Group-based access | security_baseline.md §1 |
-| CC6.3 | Access removal | Offboarding procedure | This doc §7.3 |
-| CC6.6 | Encryption | TLS 1.2 + AES-256 | This doc §1 |
-| CC6.7 | Transmission security | HTTPS/TLS | This doc §1.2 |
-| CC7.1 | Change management | PR reviews + approvals | security_baseline.md §4 |
-| CC7.2 | System monitoring | Azure Monitor + alerts | monitoring_plan.md |
-| CC8.1 | Incident response | IR procedures | security_baseline.md §7 |
+| Trust Service Criteria | Control               | Implementation         | Document                  |
+| ---------------------- | --------------------- | ---------------------- | ------------------------- |
+| CC6.1                  | Logical access        | Azure AD + MFA         | security_baseline.md §1-2 |
+| CC6.2                  | Access provisioning   | Group-based access     | security_baseline.md §1   |
+| CC6.3                  | Access removal        | Offboarding procedure  | This doc §7.3             |
+| CC6.6                  | Encryption            | TLS 1.2 + AES-256      | This doc §1               |
+| CC6.7                  | Transmission security | HTTPS/TLS              | This doc §1.2             |
+| CC7.1                  | Change management     | PR reviews + approvals | security_baseline.md §4   |
+| CC7.2                  | System monitoring     | Azure Monitor + alerts | monitoring_plan.md        |
+| CC8.1                  | Incident response     | IR procedures          | security_baseline.md §7   |
 
 ### 8.2 ISO 27001
 
-| Control | Requirement | Implementation |
-|---------|-------------|----------------|
-| A.9.1 | Access control policy | security_baseline.md |
-| A.9.2 | User access management | Azure AD groups |
-| A.10.1 | Cryptographic controls | This doc §1 |
-| A.12.4 | Logging and monitoring | monitoring_plan.md |
-| A.12.6 | Vulnerability management | This doc §2 |
-| A.14.2 | Secure development | testing_strategy.md |
-| A.16.1 | Incident management | This doc §6.2, monitoring_plan.md |
-| A.17.1 | Business continuity | disaster_recovery_plan.md |
+| Control | Requirement              | Implementation                    |
+| ------- | ------------------------ | --------------------------------- |
+| A.9.1   | Access control policy    | security_baseline.md              |
+| A.9.2   | User access management   | Azure AD groups                   |
+| A.10.1  | Cryptographic controls   | This doc §1                       |
+| A.12.4  | Logging and monitoring   | monitoring_plan.md                |
+| A.12.6  | Vulnerability management | This doc §2                       |
+| A.14.2  | Secure development       | testing_strategy.md               |
+| A.16.1  | Incident management      | This doc §6.2, monitoring_plan.md |
+| A.17.1  | Business continuity      | disaster_recovery_plan.md         |
 
 ### 8.3 HIPAA (If Applicable)
 
-| Safeguard | Requirement | Implementation |
-|-----------|-------------|----------------|
-| 164.312(a)(1) | Access control | Azure AD + RBAC |
-| 164.312(b) | Audit controls | Audit streaming + Log Analytics |
-| 164.312(c)(1) | Integrity | Checksums + artifact signing |
-| 164.312(d) | Authentication | MFA required |
-| 164.312(e)(1) | Transmission security | TLS 1.2+ |
-| 164.312(e)(2) | Encryption | At-rest + in-transit |
+| Safeguard     | Requirement           | Implementation                  |
+| ------------- | --------------------- | ------------------------------- |
+| 164.312(a)(1) | Access control        | Azure AD + RBAC                 |
+| 164.312(b)    | Audit controls        | Audit streaming + Log Analytics |
+| 164.312(c)(1) | Integrity             | Checksums + artifact signing    |
+| 164.312(d)    | Authentication        | MFA required                    |
+| 164.312(e)(1) | Transmission security | TLS 1.2+                        |
+| 164.312(e)(2) | Encryption            | At-rest + in-transit            |
 
 ---
 
@@ -775,71 +815,71 @@ az monitor scheduled-query create \
 ```yaml
 # security-scan-template.yml
 parameters:
-- name: projectPath
-  type: string
-- name: imageName
-  type: string
-  default: ''
+  - name: projectPath
+    type: string
+  - name: imageName
+    type: string
+    default: ""
 
 stages:
-- stage: SecurityScanning
-  jobs:
-  - job: SAST
-    steps:
-    - template: steps/sonar-scan.yml
-      parameters:
-        projectPath: ${{ parameters.projectPath }}
+  - stage: SecurityScanning
+    jobs:
+      - job: SAST
+        steps:
+          - template: steps/sonar-scan.yml
+            parameters:
+              projectPath: ${{ parameters.projectPath }}
 
-  - job: SCA
-    steps:
-    - template: steps/dependency-check.yml
-      parameters:
-        projectPath: ${{ parameters.projectPath }}
+      - job: SCA
+        steps:
+          - template: steps/dependency-check.yml
+            parameters:
+              projectPath: ${{ parameters.projectPath }}
 
-  - job: SecretsScan
-    steps:
-    - task: Bash@3
-      displayName: 'Detect Secrets'
-      inputs:
-        targetType: 'inline'
-        script: |
-          pip install detect-secrets
-          detect-secrets scan ${{ parameters.projectPath }} \
-            --baseline .secrets.baseline \
-            --exclude-files '\.git|\.env\.example' \
-            > secrets-results.json
+      - job: SecretsScan
+        steps:
+          - task: Bash@3
+            displayName: "Detect Secrets"
+            inputs:
+              targetType: "inline"
+              script: |
+                pip install detect-secrets
+                detect-secrets scan ${{ parameters.projectPath }} \
+                  --baseline .secrets.baseline \
+                  --exclude-files '\.git|\.env\.example' \
+                  > secrets-results.json
 
-          # Fail if new secrets found
-          if [ $(jq '.results | length' secrets-results.json) -gt 0 ]; then
-            echo "##vso[task.logissue type=error]New secrets detected!"
-            exit 1
-          fi
+                # Fail if new secrets found
+                if [ $(jq '.results | length' secrets-results.json) -gt 0 ]; then
+                  echo "##vso[task.logissue type=error]New secrets detected!"
+                  exit 1
+                fi
 
-  - job: ContainerScan
-    condition: ne('${{ parameters.imageName }}', '')
-    steps:
-    - template: steps/trivy-scan.yml
-      parameters:
-        imageName: ${{ parameters.imageName }}
+      - job: ContainerScan
+        condition: ne('${{ parameters.imageName }}', '')
+        steps:
+          - template: steps/trivy-scan.yml
+            parameters:
+              imageName: ${{ parameters.imageName }}
 
-  - job: IaCScan
-    steps:
-    - task: Bash@3
-      displayName: 'Scan IaC (Checkov)'
-      inputs:
-        targetType: 'inline'
-        script: |
-          pip install checkov
-          checkov -d ./infrastructure \
-            --framework terraform bicep arm \
-            --output junitxml \
-            --output-file checkov-results.xml \
-            --soft-fail-on MEDIUM,LOW
+      - job: IaCScan
+        steps:
+          - task: Bash@3
+            displayName: "Scan IaC (Checkov)"
+            inputs:
+              targetType: "inline"
+              script: |
+                pip install checkov
+                checkov -d ./infrastructure \
+                  --framework terraform bicep arm \
+                  --output junitxml \
+                  --output-file checkov-results.xml \
+                  --soft-fail-on MEDIUM,LOW
 
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: 'checkov-results.xml'
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "checkov-results.xml"
 ```
 
 ---

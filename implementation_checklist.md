@@ -76,26 +76,26 @@
 
 ## Current Environment Assessment
 
-### Azure AD / M365
+### Azure AD
 
-- [ ] Verify 143it.com domain is active in Azure AD
-- [ ] Confirm M365 licensing (E3/E5)
-- [ ] Check existing user accounts
-- [ ] Review existing security groups
+- [x] Verify 143it.com domain is active in Azure AD
+- [x] Confirm Azure AD Premium P1 licensing
+- [x] Check existing user accounts
+- [x] Review existing security groups
 
 ### Azure DevOps
 
-- [ ] Locate existing Azure DevOps Organization
-- [ ] Document current projects and structure
-- [ ] Review current users and permissions
-- [ ] Check billing and licensing status
+- [x] Locate existing Azure DevOps Organization
+- [x] Document current projects and structure
+- [x] Review current users and permissions
+- [x] Check billing and licensing status
 
 ### GitHub
 
-- [ ] Audit github.com/iloveyouit organization
-- [ ] List all repositories
-- [ ] Document team structure
-- [ ] Review branch protection rules
+- [x] Audit github.com/iloveyouit organization
+- [x] List all repositories
+- [x] Document team structure
+- [x] Review branch protection rules
 
 ---
 
@@ -103,19 +103,19 @@
 
 ### Organization Configuration
 
-- [ ] Rename/create organization to 143it
-- [ ] Configure organization settings
-- [ ] Set up Azure AD connection
-- [ ] Configure security policies
-- [ ] Enable/disable extensions
-- [ ] Set up billing (if needed)
+- [x] Rename/create organization to 143it
+- [x] Configure organization settings
+- [x] Set up Azure AD connection
+- [x] Configure security policies
+- [x] Enable/disable extensions
+- [x] Set up billing (if needed)
 
 ### Access Management
 
-- [ ] Create Azure AD group mapping
-- [ ] Configure default access levels
-- [ ] Set up project collection administrators
-- [ ] Review and audit user access
+- [x] Create Azure AD group mapping
+- [x] Configure default access levels
+- [x] Set up project collection administrators
+- [x] Review and audit user access
 
 ---
 
@@ -123,26 +123,26 @@
 
 ### Project Creation
 
-- [ ] Create Head_Office project
-- [ ] Select Agile process template
-- [ ] Configure project settings
-- [ ] Set up visibility (private/public)
+- [x] Create Head_Office project
+- [x] Select Agile process template
+- [x] Configure project settings
+- [x] Set up visibility (private/public)
 
 ### Team Structure
 
-- [ ] Create Development team
-- [ ] Create QA team
-- [ ] Create Operations team
-- [ ] Create Management team
-- [ ] Configure team permissions
-- [ ] Set up team areas
+- [x] Create Development team
+- [x] Create QA team
+- [x] Create Operations team
+- [x] Create Management team
+- [x] Configure team permissions
+- [x] Set up team areas
 
 ### Iteration Configuration
 
-- [ ] Define sprint cadence (2-week sprints recommended)
-- [ ] Configure iteration start/end dates
-- [ ] Set up release trains (if applicable)
-- [ ] Configure capacity planning defaults
+- [x] Define sprint cadence (2-week sprints recommended)
+- [x] Configure iteration start/end dates
+- [x] Set up release trains (if applicable)
+- [x] Configure capacity planning defaults
 
 ---
 
