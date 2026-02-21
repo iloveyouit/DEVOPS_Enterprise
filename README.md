@@ -29,11 +29,12 @@ As of the latest iteration, we have **automated** the deployment of the underlyi
    - Set up Area Paths and the first iteration (`Sprint 1`).
 4. **Agile Backlog Generated**: Programmatically translated the `implementation_checklist.md` into actionable Azure DevOps Epics, Features, and User Stories linked linearly inside the `Head_Office` board.
 
+5. **Repository Connection (Phase 6)**: Published this documentation repository into Azure Repos as an Azure DevOps Code Wiki (`Head_Office` repo).
+6. **Pipeline Configuration (Phase 7)**: Configured the environment Variable Groups (`Global-Vars`, `Dev-Environment`, `Prod-Environment`) and instantiated the standardized CI/CD YAML templates (`Enterprise-Build-Template` and `Enterprise-Release-Template`).
+
 ### What is Left to Execute (Next Steps):
 
-- **Phase 6 - Repository Connection**: We need to authenticate the Azure Pipelines GitHub App to connect this documentation (and the other 49 repositories in `iloveyouit`) into Azure DevOps.
-- **Phase 7 - Pipeline Configuration**: Constructing the YAML templates for CI/CD, configuring environments, and integrating Dev/Staging/Production gates.
-- **Phase 8-10 - Governance**: Configuring dashboard widgets, setting up Teams notifications, and establishing the formal operational runbooks.
+- **Phase 8-10 - Governance**: Configuring dashboard widgets (e.g. Sprint Burndown, CFD), setting up Teams/Slack notifications, connecting GitHub Repos, and formally enacting the operational runbooks.
 
 ## How to Make Your First Commit
 
